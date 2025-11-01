@@ -1,4 +1,4 @@
-CREATE TABLE sales (
+CREATE TABLE sales1 (
   sale_id INT,
   region VARCHAR(50),
   category VARCHAR(50),
@@ -8,7 +8,7 @@ CREATE TABLE sales (
   sale_date DATE
 );
 
-INSERT INTO sales VALUES
+INSERT INTO sales1 VALUES
 (1, 'North', 'Electronics', 'Laptop', 5, 50000, '2024-01-10'),
 (2, 'South', 'Electronics', 'Mobile', 10, 15000, '2024-02-15'),
 (3, 'East', 'Furniture', 'Chair', 20, 1500, '2024-02-18'),
@@ -36,5 +36,26 @@ INSERT INTO sales VALUES
 -- If two regions have the same total revenue, order them alphabetically.
 
 -- Finally, display only the top 3 results.
+
+select * from sales1;
+WITH saless AS (
+  SELECT
+    region,
+    category,
+    SUM(quantity * unit_price)            AS total_revenue,
+    AVG(quantity * unit_price)            AS average_revenue
+  FROM sales1                    -- or `sales` if your table is named sales
+  GROUP BY region, category
+)
+SELECT
+  region,
+  SUM(total_revenue)                    AS total_revenue,
+  SUM(CASE WHEN average_revenue > 25000 THEN 1 ELSE 0 END) 
+                                         AS qualifying_categories
+FROM saless
+GROUP BY region
+HAVING SUM(CASE WHEN average_revenue > 25000 THEN 1 ELSE 0 END) >= 2
+ORDER BY total_revenue DESC, region ASC
+LIMIT 3;
 
 
